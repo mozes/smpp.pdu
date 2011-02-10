@@ -306,7 +306,7 @@ class PDUEncoderTest(EncoderTest):
             addr_npi=AddrNpi.LAND_MOBILE,
             address_range='127.0.0.*',
         )
-        self.do_conversion_test(PDUEncoder(), reqPdu, '00000030%s00000000000000027465737400736563726574004f5441000000003402063132372e302e302e2a00' % reqCommandIdHex)
+        self.do_conversion_test(PDUEncoder(), reqPdu, '0000002d%s00000000000000027465737400736563726574004f5441003402063132372e302e302e2a00' % reqCommandIdHex)
         respPdu = reqPdu.requireAck(1, CommandStatus.ESME_ROK, system_id='TSI7588', sc_interface_version=0x34)
         self.do_conversion_test(PDUEncoder(), respPdu, '0000001d%s000000000000000154534937353838000210000134' % respCommandIdHex)
 
