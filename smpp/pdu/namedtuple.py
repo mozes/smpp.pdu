@@ -1,3 +1,9 @@
+"""
+This file comes from http://code.activestate.com/recipes/500261-named-tuples/
+Licensed under Python Software Foundation license: http://www.opensource.org/licenses/PythonSoftFoundation
+
+"""
+
 from operator import itemgetter as _itemgetter
 from keyword import iskeyword as _iskeyword
 import sys as _sys
