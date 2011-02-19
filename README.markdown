@@ -1,4 +1,4 @@
-smpp.pdu is a Python implementation for parsing messages, called Protocol Data Units (PDUs) in the SMPP protocol.
+smpp.pdu is a Python library for parsing Protocol Data Units (PDUs) in SMPP protocol
 
 http://www.nowsms.com/discus/messages/1/24856.html 
 
