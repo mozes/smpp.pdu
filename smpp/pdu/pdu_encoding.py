@@ -252,7 +252,7 @@ class IntegerWrapperEncoder(PDUNullableFieldEncoder):
     def _decode(self, bytes):
         intVal = self.encoder._decode(bytes)
         if intVal not in self.valueMap:
-            errStr = "Unknown %s value %s" % (self.fieldName, intVal)
+            errStr = "Unknown %s value %s" % (self.fieldName, hex(intVal))
             raise self.decodeErrorClass(errStr, self.decodeErrorStatus)
         name = self.valueMap[intVal]
         return getattr(self.pduType, name)
@@ -566,7 +566,7 @@ class CallbackNumEncoder(OctetStringEncoder):
 
 class SubaddressTypeTagEncoder(IntegerWrapperEncoder):
     nullable = False
-    fieldName = 'callback_num_digit_mode_indicator'
+    fieldName = 'subaddress_type_tag'
     nameMap = constants.subaddress_type_tag_name_map
     valueMap = constants.subaddress_type_tag_value_map
     encoder = Int1Encoder()
@@ -579,15 +579,15 @@ class SubaddressEncoder(OctetStringEncoder):
     def _encode(self, subaddress):
         encoded = ''
         encoded += self.typeTagEncoder._encode(subaddress.typeTag)
-        encoded += OctetStringEncoder(self.size - 1)._encode(subaddress.value)
+        encoded += OctetStringEncoder(self.getSize() - 1)._encode(subaddress.value)
         return encoded
     
     def _decode(self, bytes):
         if len(bytes) < 2:
             raise PDUParseError("Invalid subaddress size %s" % len(bytes), pdu_types.CommandStatus.ESME_RINVOPTPARAMVAL)
-        
+
         typeTag = self.typeTagEncoder._decode(bytes[0])
-        value = OctetStringEncoder(self.size - 1)._decode(bytes[1:])
+        value = OctetStringEncoder(self.getSize() - 1)._decode(bytes[1:])
         return pdu_types.Subaddress(typeTag, value)
 
 class AddrSubunitEncoder(IntegerWrapperEncoder):
