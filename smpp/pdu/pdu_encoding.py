@@ -564,6 +564,32 @@ class CallbackNumEncoder(OctetStringEncoder):
         digits = bytes[3:]
         return pdu_types.CallbackNum(digitModeIndicator, ton, npi, digits)
 
+class SubaddressTypeTagEncoder(IntegerWrapperEncoder):
+    nullable = False
+    fieldName = 'callback_num_digit_mode_indicator'
+    nameMap = constants.subaddress_type_tag_name_map
+    valueMap = constants.subaddress_type_tag_value_map
+    encoder = Int1Encoder()
+    pduType = pdu_types.SubaddressTypeTag
+    decodeErrorStatus = pdu_types.CommandStatus.ESME_RINVOPTPARAMVAL
+
+class SubaddressEncoder(OctetStringEncoder):
+    typeTagEncoder = SubaddressTypeTagEncoder()
+
+    def _encode(self, subaddress):
+        encoded = ''
+        encoded += self.typeTagEncoder._encode(subaddress.typeTag)
+        encoded += OctetStringEncoder(self.size - 1)._encode(subaddress.value)
+        return encoded
+    
+    def _decode(self, bytes):
+        if len(bytes) < 2:
+            raise PDUParseError("Invalid subaddress size %s" % len(bytes), pdu_types.CommandStatus.ESME_RINVOPTPARAMVAL)
+        
+        typeTag = self.typeTagEncoder._decode(bytes[0])
+        value = OctetStringEncoder(self.size - 1)._decode(bytes[1:])
+        return pdu_types.Subaddress(typeTag, value)
+
 class AddrSubunitEncoder(IntegerWrapperEncoder):
     fieldName = 'addr_subunit'
     nameMap = constants.addr_subunit_name_map
@@ -688,8 +714,8 @@ class OptionEncoder(IEncoder):
             T.receipted_message_id: COctetStringEncoder(65),
             # T.ms_msg_wait_facilities: TODO(),
             T.privacy_indicator: PrivacyIndicatorEncoder(),
-            # T.source_subaddress: SubaddressEncoder(),
-            # T.dest_subaddress: SubaddressEncoder(),
+            T.source_subaddress: SubaddressEncoder(self.getLength),
+            T.dest_subaddress: SubaddressEncoder(self.getLength),
             T.user_message_reference: Int2Encoder(),
             T.user_response_code: Int1Encoder(),
             T.language_indicator: LanguageIndicatorEncoder(),
@@ -824,6 +850,9 @@ class PDUEncoder(IEncoder):
         }
     }
 
+    def __init__(self):
+        self.optionEncoder = OptionEncoder()
+
     def getRequiredParamEncoders(self, pdu):
         if pdu.id in self.CustomRequiredParamEncoders:
             return dict(self.DefaultRequiredParamEncoders.items() + self.CustomRequiredParamEncoders[pdu.id].items())
@@ -893,14 +922,14 @@ class PDUEncoder(IEncoder):
             if paramName in params:
                 tag = getattr(pdu_types.Tag, paramName)
                 value = params[paramName]
-                result += OptionEncoder().encode(pdu_types.Option(tag, value))
+                result += self.optionEncoder.encode(pdu_types.Option(tag, value))
         return result
     
     def decodeOptionalParams(self, paramList, file, optionsLength):
         optionalParams = {}
         iBefore = file.tell()
         while file.tell() - iBefore < optionsLength:
-            option = OptionEncoder().decode(file)
+            option = self.optionEncoder.decode(file)
             optionName = str(option.tag)
             if optionName not in paramList:
                 raise PDUParseError("Invalid option %s" % optionName, pdu_types.CommandStatus.ESME_ROPTPARNOTALLWD)

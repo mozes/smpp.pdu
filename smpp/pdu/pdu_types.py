@@ -95,6 +95,7 @@ class DataCoding(object):
 DestFlag = Enum(*constants.dest_flag_name_map.keys())
 MessageState = Enum(*constants.message_state_name_map.keys())
 CallbackNumDigitModeIndicator = Enum(*constants.callback_num_digit_mode_indicator_name_map.keys())
+SubaddressTypeTag = Enum(*constants.subaddress_type_tag_name_map.keys())
 
 CallbackNumBase = namedtuple('CallbackNum', 'digitModeIndicator, ton, npi, digits')
 class CallbackNum(CallbackNumBase):
@@ -104,6 +105,15 @@ class CallbackNum(CallbackNumBase):
     
     def __repr__(self):
         return 'CallbackNum[digitModeIndicator: %s, ton: %s, npi: %s, digits: %s]' % (self.digitModeIndicator, self.ton, self.npi, self.digits)
+
+SubaddressBase = namedtuple('Subaddress', 'typeTag, value')
+class Subaddress(SubaddressBase):
+    
+    def __new__(cls, typeTag, value):
+        return SubaddressBase.__new__(cls, typeTag, value)
+    
+    def __repr__(self):
+        return 'Subaddress[typeTag: %s, value: %s]' % (self.typeTag, repr(self.value))
 
 AddrSubunit = Enum(*constants.addr_subunit_name_map.keys())
 NetworkType = Enum(*constants.network_type_name_map.keys())

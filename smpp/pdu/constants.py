@@ -436,6 +436,13 @@ callback_num_digit_mode_indicator_name_map = {
 }
 callback_num_digit_mode_indicator_value_map = dict([(val, key) for (key, val) in callback_num_digit_mode_indicator_name_map.items()])
 
+subaddress_type_tag_name_map = {
+    'NSAP_EVEN': 0x10000000,
+    'NSAP_ODD': 0x10001000,
+    'USER_SPECIFIED': 0x10100000,
+}
+subaddress_type_tag_value_map = dict([(val, key) for (key, val) in subaddress_type_tag_name_map.items()])
+
 ms_availability_status_name_map = {
     'AVAILABLE': 0x00,
     'DENIED': 0x01,
