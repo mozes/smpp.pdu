@@ -579,7 +579,8 @@ class SubaddressEncoder(OctetStringEncoder):
     def _encode(self, subaddress):
         encoded = ''
         encoded += self.typeTagEncoder._encode(subaddress.typeTag)
-        encoded += OctetStringEncoder(self.getSize() - 1)._encode(subaddress.value)
+        valSize = self.getSize() - 1 if self.getSize() is not None else None
+        encoded += OctetStringEncoder(valSize)._encode(subaddress.value)
         return encoded
     
     def _decode(self, bytes):

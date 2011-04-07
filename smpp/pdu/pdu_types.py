@@ -113,7 +113,7 @@ class Subaddress(SubaddressBase):
         return SubaddressBase.__new__(cls, typeTag, value)
     
     def __repr__(self):
-        return 'Subaddress[typeTag: %s, value: %s]' % (self.typeTag, repr(self.value))
+        return 'Subaddress[typeTag: %s, value: %s]' % (self.typeTag, self.value)
 
 AddrSubunit = Enum(*constants.addr_subunit_name_map.keys())
 NetworkType = Enum(*constants.network_type_name_map.keys())

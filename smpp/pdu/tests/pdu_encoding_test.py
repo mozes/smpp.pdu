@@ -272,7 +272,24 @@ class CallbackNumEncoderTest(EncoderTest):
 
     def test_decode_invalid_size(self):
         self.do_decode_parse_error_test(CallbackNumEncoder(2).decode, CommandStatus.ESME_RINVOPTPARAMVAL, '0100')
-        
+
+class SubaddressTypeTagEncoderTest(EncoderTest):
+
+    def test_conversion(self):
+        self.do_conversion_test(SubaddressTypeTagEncoder(), SubaddressTypeTag.USER_SPECIFIED, 'a0')
+        self.assertRaises(ValueError, SubaddressTypeTagEncoder().encode, None)
+
+class SubaddressEncoderTest(EncoderTest):
+    
+    def test_conversion(self):
+        self.do_conversion_test(SubaddressEncoder(4), Subaddress(SubaddressTypeTag.USER_SPECIFIED, value='742'), 'a0373432')
+
+    def test_decode_invalid_type(self):
+        self.do_decode_parse_error_test(SubaddressEncoder(4).decode, CommandStatus.ESME_RINVOPTPARAMVAL, 'a1373432')
+
+    def test_decode_invalid_size(self):
+        self.do_decode_parse_error_test(SubaddressEncoder(1).decode, CommandStatus.ESME_RINVOPTPARAMVAL, 'a0373432')
+
 class TimeEncoderEncoderTest(EncoderTest):
 
     def test_conversion(self):
@@ -391,7 +408,7 @@ class PDUEncoderTest(EncoderTest):
             service_type = 'CMT',
             source_addr_ton=AddrTon.INTERNATIONAL,
             source_addr_npi=AddrNpi.UNKNOWN,
-            source_addr='341114954928',
+            source_addr='3411149500001',
             dest_addr_ton=AddrTon.INTERNATIONAL,
             dest_addr_npi=AddrNpi.UNKNOWN,
             destination_addr='12345455',
@@ -403,7 +420,28 @@ class PDUEncoderTest(EncoderTest):
             data_coding=DataCoding(DataCodingScheme.GSM_MESSAGE_CLASS, DataCodingGsmMsg(DataCodingGsmMsgCoding.DEFAULT_ALPHABET, DataCodingGsmMsgClass.CLASS_2)),
             short_message='HELLO\x00',
         )
-        self.do_conversion_test(PDUEncoder(), pdu, '0000003e000000050000000000000001434d5400010033343131313439353439323800010031323334353435350000000000000000f2000648454c4c4f00')
+        self.do_conversion_test(PDUEncoder(), pdu, '0000003f000000050000000000000001434d540001003334313131343935303030303100010031323334353435350000000000000000f2000648454c4c4f00')
+
+    def test_DeliverSM_with_subaddress(self):
+        pdu = DeliverSM(1,
+            service_type = 'BM8',
+            source_addr_ton=AddrTon.INTERNATIONAL,
+            source_addr_npi=AddrNpi.ISDN,
+            source_addr='46123456789',
+            dest_addr_ton=AddrTon.INTERNATIONAL,
+            dest_addr_npi=AddrNpi.ISDN,
+            destination_addr='14046653410',
+            esm_class=EsmClass(EsmClassMode.DEFAULT, EsmClassType.DEFAULT),
+            protocol_id=0,
+            priority_flag=PriorityFlag.LEVEL_0,
+            registered_delivery=RegisteredDelivery(RegisteredDeliveryReceipt.NO_SMSC_DELIVERY_RECEIPT_REQUESTED),
+            replace_if_present_flag=ReplaceIfPresentFlag.DO_NOT_REPLACE,
+            data_coding=DataCoding(DataCodingScheme.GSM_MESSAGE_CLASS, DataCodingGsmMsg(DataCodingGsmMsgCoding.DEFAULT_ALPHABET, DataCodingGsmMsgClass.CLASS_2)),
+            short_message="Hello I'm a bigg fan of you",
+            source_subaddress=Subaddress(SubaddressTypeTag.USER_SPECIFIED, '742'),
+            dest_subaddress=Subaddress(SubaddressTypeTag.USER_SPECIFIED, '4131'),
+        )
+        self.do_conversion_test(PDUEncoder(), pdu, '00000066000000050000000000000001424d38000101343631323334353637383900010131343034363635333431300000000000000000f2001b48656c6c6f2049276d206120626967672066616e206f6620796f7502020004a037343202030005a034313331')
         
     def test_EnquireLink_conversion(self):
         pdu = EnquireLink(6, CommandStatus.ESME_ROK)
