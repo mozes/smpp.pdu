@@ -23,7 +23,7 @@ from smpp.pdu.pdu_types import *
 from smpp.pdu.operations import *
 
 class EncoderTest(unittest.TestCase):
-    
+
     def do_conversion_test(self, encoder, value, hexdumpValue):
         encoded = encoder.encode(value)
         hexEncoded = binascii.b2a_hex(encoded)
@@ -35,29 +35,29 @@ class EncoderTest(unittest.TestCase):
             for i in range(0, len(hexEncoded)):
                 if chars1[i] != chars2[i]:
                     print "Letter %d diff [%s] [%s]" % (i, chars1[i], chars2[i])
-            
+
         self.assertEquals(hexdumpValue, hexEncoded)
         file = StringIO.StringIO(encoded)
         decoded = encoder.decode(file)
         self.assertEquals(value, decoded)
-        
+
     def do_null_encode_test(self, encoder, nullDecodeVal, hexdumpValue):
         encoded = encoder.encode(None)
         self.assertEquals(hexdumpValue, binascii.b2a_hex(encoded))
         file = StringIO.StringIO(encoded)
         decoded = encoder.decode(file)
         self.assertEquals(nullDecodeVal, decoded)
-        
+
     def decode(self, decodeFunc, hexdumpValue):
         return decodeFunc(StringIO.StringIO(binascii.a2b_hex(hexdumpValue)))
-        
+
     def do_decode_parse_error_test(self, decodeFunc, status, hexdumpValue):
         try:
             decoded = self.decode(decodeFunc, hexdumpValue)
             self.assertTrue(False, 'Decode did not throw exception. Result was: %s' % str(decoded))
         except PDUParseError, e:
             self.assertEquals(status, e.status)
-            
+
     def do_decode_corrupt_data_error_test(self, decodeFunc, status, hexdumpValue):
         try:
             decoded = self.decode(decodeFunc, hexdumpValue)
@@ -66,12 +66,12 @@ class EncoderTest(unittest.TestCase):
             self.assertEquals(status, e.status)
 
 class EmptyEncoderTest(EncoderTest):
-    
+
     def test_conversion(self):
         self.do_conversion_test(EmptyEncoder(), None, '')
 
 class IntegerEncoderTest(EncoderTest):
-    
+
     def test_int4(self):
         self.do_conversion_test(Int4Encoder(), 0x800001FF, '800001ff')
 
@@ -80,78 +80,78 @@ class IntegerEncoderTest(EncoderTest):
         self.do_conversion_test(encoder, 255, 'ff')
         self.assertRaises(ValueError, encoder.encode, 256)
         self.do_null_encode_test(encoder, 0, '00')
-        
+
     def test_int1_max(self):
         self.assertRaises(ValueError, Int1Encoder, max=256)
         encoder = Int1Encoder(max=254)
         self.do_conversion_test(encoder, 254, 'fe')
         self.assertRaises(ValueError, encoder.encode, 255)
-        
+
     def test_int1_min(self):
         self.assertRaises(ValueError, Int1Encoder, min=-1)
         encoder = Int1Encoder(min=1)
         self.do_conversion_test(encoder, 1, '01')
         self.do_conversion_test(encoder, None, '00')
         self.assertRaises(ValueError, encoder.encode, 0)
-        
+
     def test_int2(self):
         self.do_conversion_test(Int2Encoder(), 0x41AC, '41ac')
 
 class COctetStringEncoderTest(EncoderTest):
-    
+
     def test_conversion(self):
         self.do_conversion_test(COctetStringEncoder(), 'hello', '68656c6c6f00')
         self.do_conversion_test(COctetStringEncoder(6), 'hello', '68656c6c6f00')
         self.do_conversion_test(COctetStringEncoder(1), '', '00')
         self.do_null_encode_test(COctetStringEncoder(), '', '00')
         self.assertRaises(ValueError, COctetStringEncoder, 0)
-        
+
     def test_maxLength_exceeded(self):
         encoder = COctetStringEncoder(5, decodeErrorStatus=CommandStatus.ESME_RINVSRCADR)
         self.assertRaises(ValueError, encoder.encode, 'hello')
         self.do_decode_parse_error_test(encoder.decode, CommandStatus.ESME_RINVSRCADR, '68656c6c6f00')
-        
+
     def test_ascii_required(self):
         encoder = COctetStringEncoder()
         self.assertRaises(ValueError, encoder.encode, u'\x9b\xa2\x7c')
-        
+
     def test_requireNull(self):
         encoder = COctetStringEncoder(decodeNull=True, requireNull=True)
         self.do_conversion_test(encoder, None, '00')
         self.assertRaises(ValueError, encoder.encode, 'test')
         self.do_decode_parse_error_test(encoder.decode, CommandStatus.ESME_RUNKNOWNERR, '68656c6c6f00')
-        
+
 class OctetStringEncoderTest(EncoderTest):
-    
+
     def test_conversion(self):
         hex = '68656c6c6f'
         self.do_conversion_test(OctetStringEncoder(len(hex)/2), binascii.a2b_hex(hex), hex)
         self.do_conversion_test(OctetStringEncoder(0), '', '')
-        
+
     def test_maxLength_exceeded(self):
         encoder = OctetStringEncoder(1)
         self.assertRaises(ValueError, encoder.encode, binascii.a2b_hex('ffaa'))
-         
+
 class CommandIdEncoderTest(EncoderTest):
-    
+
     def test_conversion(self):
         self.do_conversion_test(CommandIdEncoder(), CommandId.enquire_link_resp, '80000015')
-        
+
     def test_decode_invalid_command_id(self):
         self.do_decode_corrupt_data_error_test(CommandIdEncoder().decode, CommandStatus.ESME_RINVCMDID, 'f0000009')
-        
+
 class CommandStatusEncoderTest(EncoderTest):
-    
+
     def test_conversion(self):
         self.do_conversion_test(CommandStatusEncoder(), CommandStatus.ESME_RUNKNOWNERR, '000000ff')
 
 class TagEncoderTest(EncoderTest):
-    
+
     def test_conversion(self):
         self.do_conversion_test(TagEncoder(), Tag.language_indicator, '020d')
 
 class EsmClassEncoderTest(EncoderTest):
-    
+
     def test_conversion(self):
         self.do_conversion_test(EsmClassEncoder(), EsmClass(EsmClassMode.DATAGRAM, EsmClassType.INTERMEDIATE_DELIVERY_NOTIFICATION, [EsmClassGsmFeatures.SET_REPLY_PATH]), 'a1')
         self.do_null_encode_test(EsmClassEncoder(), EsmClass(EsmClassMode.DEFAULT, EsmClassType.DEFAULT, []), '00')
@@ -160,7 +160,7 @@ class EsmClassEncoderTest(EncoderTest):
         self.do_decode_parse_error_test(EsmClassEncoder().decode, CommandStatus.ESME_RINVESMCLASS, '30')
 
 class RegisteredDeliveryEncoderTest(EncoderTest):
-    
+
     def test_conversion(self):
         value = RegisteredDelivery(RegisteredDeliveryReceipt.SMSC_DELIVERY_RECEIPT_REQUESTED, [RegisteredDeliverySmeOriginatedAcks.SME_DELIVERY_ACK_REQUESTED, RegisteredDeliverySmeOriginatedAcks.SME_MANUAL_ACK_REQUESTED], True)
         self.do_conversion_test(RegisteredDeliveryEncoder(), value, '1d')
@@ -170,12 +170,12 @@ class RegisteredDeliveryEncoderTest(EncoderTest):
         self.do_decode_parse_error_test(RegisteredDeliveryEncoder().decode, CommandStatus.ESME_RINVREGDLVFLG, '03')
 
 class AddrTonEncoderTest(EncoderTest):
-    
+
     def test_conversion(self):
         self.do_conversion_test(AddrTonEncoder(fieldName='source_addr_ton'), AddrTon.ALPHANUMERIC, '05')
 
 class PriorityFlagEncoderTest(EncoderTest):
-    
+
     def test_conversion(self):
         self.do_conversion_test(PriorityFlagEncoder(), PriorityFlag.LEVEL_2, '02')
 
@@ -183,10 +183,10 @@ class PriorityFlagEncoderTest(EncoderTest):
         self.do_decode_parse_error_test(PriorityFlagEncoder().decode, CommandStatus.ESME_RINVPRTFLG, '0f')
 
 class AddrNpiEncoderTest(EncoderTest):
-    
+
     def test_conversion(self):
         self.do_conversion_test(AddrNpiEncoder(fieldName='source_addr_npi'), AddrNpi.LAND_MOBILE, '06')
-        
+
 class AddrSubunitEncoderTest(EncoderTest):
 
     def test_conversion(self):
@@ -221,7 +221,7 @@ class DisplayTimeEncoderTest(EncoderTest):
 
     def test_conversion(self):
         self.do_conversion_test(DisplayTimeEncoder(), DisplayTime.INVOKE, '02')
-        
+
 class MsAvailabilityStatusEncoderTest(EncoderTest):
 
     def test_conversion(self):
@@ -241,7 +241,7 @@ class DataCodingEncoderTest(EncoderTest):
         self.do_conversion_test(DataCodingEncoder(), DataCoding(DataCodingScheme.RAW, 48), '30')
         self.do_conversion_test(DataCodingEncoder(), DataCoding(DataCodingScheme.RAW, 11), '0b')
         self.do_conversion_test(DataCodingEncoder(), DataCoding(DataCodingScheme.GSM_MESSAGE_CLASS, DataCodingGsmMsg(DataCodingGsmMsgCoding.DEFAULT_ALPHABET, DataCodingGsmMsgClass.CLASS_1)), 'f1')
-        
+
 class DestFlagEncoderTest(EncoderTest):
 
     def test_conversion(self):
@@ -263,7 +263,7 @@ class CallbackNumDigitModeIndicatorEncoderTest(EncoderTest):
         self.assertRaises(ValueError, CallbackNumDigitModeIndicatorEncoder().encode, None)
 
 class CallbackNumEncoderTest(EncoderTest):
-    
+
     def test_conversion(self):
         self.do_conversion_test(CallbackNumEncoder(13), CallbackNum(CallbackNumDigitModeIndicator.ASCII, digits='8033237457'), '01000038303333323337343537')
 
@@ -280,7 +280,7 @@ class SubaddressTypeTagEncoderTest(EncoderTest):
         self.assertRaises(ValueError, SubaddressTypeTagEncoder().encode, None)
 
 class SubaddressEncoderTest(EncoderTest):
-    
+
     def test_conversion(self):
         self.do_conversion_test(SubaddressEncoder(4), Subaddress(SubaddressTypeTag.USER_SPECIFIED, value='742'), 'a0373432')
 
@@ -295,13 +295,13 @@ class TimeEncoderEncoderTest(EncoderTest):
     def test_conversion(self):
         self.do_conversion_test(TimeEncoder(), datetime(2007, 9, 27, 23, 34, 29, 800000), binascii.b2a_hex('070927233429800+' + '\0'))
         self.do_conversion_test(TimeEncoder(), None, '00')
-    
+
     def test_requireNull(self):
         encoder = TimeEncoder(requireNull=True)
         self.do_conversion_test(encoder, None, '00')
         self.assertRaises(ValueError, encoder.encode, datetime.now())
         self.do_decode_parse_error_test(encoder.decode, CommandStatus.ESME_RUNKNOWNERR, binascii.b2a_hex('070927233429800+' + '\0'))
-        
+
     def test_decode_invalid(self):
         self.do_decode_parse_error_test(TimeEncoder(decodeErrorStatus=CommandStatus.ESME_RINVSRCADR).decode, CommandStatus.ESME_RINVSRCADR, binascii.b2a_hex('070927233429800' + '\0'))
 
@@ -310,24 +310,24 @@ class ShortMessageEncoderTest(EncoderTest):
     def test_conversion(self):
         self.do_conversion_test(ShortMessageEncoder(), 'hello', '0568656c6c6f')
         self.do_null_encode_test(ShortMessageEncoder(), '', '00')
-        
+
 class OptionEncoderTest(EncoderTest):
-    
+
     def test_dest_addr_subunit(self):
         self.do_conversion_test(OptionEncoder(), Option(Tag.dest_addr_subunit, AddrSubunit.MOBILE_EQUIPMENT), '0005000102')
-        
+
     def test_decode_invalid_dest_addr_subunit(self):
         self.do_decode_parse_error_test(OptionEncoder().decode, CommandStatus.ESME_RINVOPTPARAMVAL, '00050001ff')
-        
+
     def test_message_payload(self):
         hexVal = 'ffaa01ce'
         self.do_conversion_test(OptionEncoder(), Option(Tag.message_payload, binascii.a2b_hex(hexVal)), '04240004' + hexVal)
-        
+
     def test_alert_on_message_delivery(self):
         self.do_conversion_test(OptionEncoder(), Option(Tag.alert_on_message_delivery, None), '130c0000')
 
 class PDUEncoderTest(EncoderTest):
-    
+
     def do_bind_conversion_test(self, pduBindKlass, reqCommandIdHex, respCommandIdHex):
         reqPdu = pduBindKlass(2, CommandStatus.ESME_ROK,
             system_id='test',
@@ -352,11 +352,11 @@ class PDUEncoderTest(EncoderTest):
 
     def test_BindTransceiver_conversion(self):
         self.do_bind_conversion_test(BindTransceiver, '00000009', '80000009')
-        
+
     def test_Unbind_conversion(self):
         pdu = Unbind(4)
         self.do_conversion_test(PDUEncoder(), pdu, '00000010000000060000000000000004')
-        
+
     def test_UnbindResp_conversion(self):
         pdu = UnbindResp(5, CommandStatus.ESME_ROK)
         self.do_conversion_test(PDUEncoder(), pdu, '00000010800000060000000000000005')
@@ -364,7 +364,7 @@ class PDUEncoderTest(EncoderTest):
     def test_GenericNack_conversion(self):
         pdu = GenericNack(None, CommandStatus.ESME_RSYSERR)
         self.do_conversion_test(PDUEncoder(), pdu, '00000010800000000000000800000000')
-        
+
     def test_DeliverSM_syniverse_MO_conversion(self):
         pdu = DeliverSM(2676551972,
             service_type = 'AWSBD',
@@ -444,15 +444,15 @@ class PDUEncoderTest(EncoderTest):
             dest_subaddress=Subaddress(SubaddressTypeTag.USER_SPECIFIED, '4131'),
         )
         self.do_conversion_test(PDUEncoder(), pdu, '00000066000000050000000000000001424d38000101343631323334353637383900010131343034363635333431300000000000000000f2001b48656c6c6f2049276d206120626967672066616e206f6620796f7502020004a037343202030005a034313331')
-        
+
     def test_EnquireLink_conversion(self):
         pdu = EnquireLink(6, CommandStatus.ESME_ROK)
         self.do_conversion_test(PDUEncoder(), pdu, '00000010000000150000000000000006')
-        
+
     def test_EnquireLinkResp_conversion(self):
         pdu = EnquireLinkResp(7)
         self.do_conversion_test(PDUEncoder(), pdu, '00000010800000150000000000000007')
-        
+
     def test_AlertNotification_conversion(self):
         pdu = AlertNotification(
             source_addr_ton=AddrTon.NATIONAL,
@@ -467,11 +467,12 @@ class PDUEncoderTest(EncoderTest):
     def test_QuerySMResp_conversion(self):
         pdu = QuerySMResp(
             message_id = 'Smsc2003',
-            source_addr_ton=AddrTon.UNKNOWN,
-            source_addr_npi=AddrNpi.UNKNOWN,
-            source_addr=None,
+           final_date = None,
+           message_state = MessageState.UNKNOWN,
+           error_code = None
         )
-        self.do_conversion_test(PDUEncoder(), pdu, '0000001c800000030000000000000000536d73633230303300000000')
+
+        self.do_conversion_test(PDUEncoder(), pdu, '0000001c800000030000000000000000536d73633230303300000700')
     def test_SubmitSM_conversion(self):
         pdu = SubmitSM(9284,
             service_type='',
@@ -512,13 +513,13 @@ class PDUEncoderTest(EncoderTest):
 
     def test_decode_command_length_too_short(self):
         self.do_decode_corrupt_data_error_test(PDUEncoder().decode, CommandStatus.ESME_RINVCMDLEN, '0000000f000000060000000000000000')
-        
+
     def test_decode_command_length_too_long(self):
         self.do_decode_corrupt_data_error_test(PDUEncoder().decode, CommandStatus.ESME_RINVCMDLEN, '00000011000000060000000000000000ff')
-        
+
     def test_decodeHeader_command_length_too_short(self):
         self.do_decode_corrupt_data_error_test(PDUEncoder().decodeHeader, CommandStatus.ESME_RINVCMDLEN, '0000000f000000060000000000000000')
-        
+
     def test_decode_bad_message_length_msg_too_short(self):
         self.do_decode_corrupt_data_error_test(PDUEncoder().decode, CommandStatus.ESME_RINVMSGLEN, '000000fd80000009000000000000000154534937353838000210000134')
 
@@ -527,6 +528,6 @@ class PDUEncoderTest(EncoderTest):
 
     def test_decode_bad_message_ends_in_middle_of_option(self):
         self.do_decode_corrupt_data_error_test(PDUEncoder().decode, CommandStatus.ESME_RINVMSGLEN, '0000001b8000000900000000000000015453493735383800021000')
-        
+
 if __name__ == '__main__':
     unittest.main()
