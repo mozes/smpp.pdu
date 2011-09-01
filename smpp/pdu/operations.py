@@ -19,6 +19,15 @@ class BindTransmitterResp(PDUResponse):
     commandId = CommandId.bind_transmitter_resp
     mandatoryParams = ['system_id']
     optionalParams = ['sc_interface_version']
+    
+    def __init__(self, seqNum=None, status=CommandStatus.ESME_ROK, **kwargs):
+        """The PDU has no defined body when the status is not 0
+        c.f. 4.1.4. "BIND_RECEIVER_RESP"
+        """
+        if status != CommandStatus.ESME_ROK:
+            self.mandatoryParams = []
+        
+        PDUResponse.__init__(self, seqNum, status, **kwargs)
 
 class BindTransmitter(PDURequest):
     requireAck = BindTransmitterResp
@@ -37,6 +46,15 @@ class BindReceiverResp(PDUResponse):
     commandId = CommandId.bind_receiver_resp
     mandatoryParams = ['system_id']
     optionalParams = ['sc_interface_version']
+    
+    def __init__(self, seqNum=None, status=CommandStatus.ESME_ROK, **kwargs):
+        """The PDU has no defined body when the status is not 0
+        c.f. 4.1.4. "BIND_RECEIVER_RESP"
+        """
+        if status != CommandStatus.ESME_ROK:
+            self.mandatoryParams = []
+        
+        PDUResponse.__init__(self, seqNum, status, **kwargs)
 
 class BindReceiver(PDURequest):
     requireAck = BindReceiverResp
@@ -55,6 +73,15 @@ class BindTransceiverResp(PDUResponse):
     commandId = CommandId.bind_transceiver_resp
     mandatoryParams = ['system_id']
     optionalParams = ['sc_interface_version']
+    
+    def __init__(self, seqNum=None, status=CommandStatus.ESME_ROK, **kwargs):
+        """The PDU has no defined body when the status is not 0
+        c.f. 4.1.4. "BIND_RECEIVER_RESP"
+        """
+        if status != CommandStatus.ESME_ROK:
+            self.mandatoryParams = []
+        
+        PDUResponse.__init__(self, seqNum, status, **kwargs)
     
 class BindTransceiver(PDURequest):
     requireAck = BindTransceiverResp
@@ -89,6 +116,15 @@ class GenericNack(PDUResponse):
 class SubmitSMResp(PDUResponse):
     commandId = CommandId.submit_sm_resp
     mandatoryParams = ['message_id']
+    
+    def __init__(self, seqNum=None, status=CommandStatus.ESME_ROK, **kwargs):
+        """The PDU has no defined body when the status is not 0
+        c.f. 4.4.2. SMPP PDU Definition "SUBMIT_SM_RESP"
+        """
+        if status != CommandStatus.ESME_ROK:
+            self.mandatoryParams = []
+        
+        PDUResponse.__init__(self, seqNum, status, **kwargs)
 
 class SubmitSM(PDUDataRequest):
     requireAck = SubmitSMResp
