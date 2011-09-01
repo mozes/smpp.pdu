@@ -848,6 +848,12 @@ class PDUEncoder(IEncoder):
         },
         pdu_types.CommandId.deliver_sm_resp: {
             'message_id': COctetStringEncoder(decodeNull=True, requireNull=True, decodeErrorStatus=pdu_types.CommandStatus.ESME_RINVMSGID),
+        },
+         pdu_types.CommandId.query_sm_resp: {
+            'final_date': TimeEncoder(),
+            'message_state':MessageStateEncoder(decodeNull=True, nullable=True),
+            'error_code':Int1Encoder(decodeNull=True),
+            'source_addr': COctetStringEncoder(65, decodeErrorStatus=pdu_types.CommandStatus.ESME_RINVSRCADR),
         }
     }
 
