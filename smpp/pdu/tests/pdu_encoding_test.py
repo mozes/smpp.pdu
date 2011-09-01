@@ -529,6 +529,34 @@ class PDUEncoderTest(EncoderTest):
 
     def test_decode_bad_message_ends_in_middle_of_option(self):
         self.do_decode_corrupt_data_error_test(PDUEncoder().decode, CommandStatus.ESME_RINVMSGLEN, '0000001b8000000900000000000000015453493735383800021000')
+        
+    def test_SubmitSMResp_error_has_no_body(self):
+        pdu = SubmitSMResp(1234, status=CommandStatus.ESME_RMSGQFUL)
+        self.assertTrue(len(SubmitSMResp.mandatoryParams) > 0)
+        for param in SubmitSMResp.mandatoryParams:
+            self.assertFalse(param in pdu.params)
+        self.do_conversion_test(PDUEncoder(), pdu, '000000108000000400000014000004d2')
+
+    def test_BindReceiverResp_error_has_no_body(self):
+        pdu = BindReceiverResp(3456, status=CommandStatus.ESME_RINVPASWD)
+        self.assertTrue(len(BindReceiverResp.mandatoryParams) > 0)
+        for param in BindReceiverResp.mandatoryParams:
+            self.assertFalse(param in pdu.params)
+        self.do_conversion_test(PDUEncoder(), pdu, '00000010800000010000000e00000d80')
+
+    def test_BindTransmitterResp_error_has_no_body(self):
+        pdu = BindTransmitterResp(3456, status=CommandStatus.ESME_RINVPASWD)
+        self.assertTrue(len(BindTransmitterResp.mandatoryParams) > 0)
+        for param in BindTransmitterResp.mandatoryParams:
+            self.assertFalse(param in pdu.params)
+        self.do_conversion_test(PDUEncoder(), pdu, '00000010800000020000000e00000d80')
+
+    def test_BindTransceiverResp_error_has_no_body(self):
+        pdu = BindTransceiverResp(3456, status=CommandStatus.ESME_RINVPASWD)
+        self.assertTrue(len(BindTransceiverResp.mandatoryParams) > 0)
+        for param in BindTransceiverResp.mandatoryParams:
+            self.assertFalse(param in pdu.params)
+        self.do_conversion_test(PDUEncoder(), pdu, '00000010800000090000000e00000d80')
 
 if __name__ == '__main__':
     unittest.main()

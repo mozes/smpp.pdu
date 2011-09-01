@@ -167,7 +167,18 @@ class PDURequest(PDU):
     requireAck = None
 
 class PDUResponse(PDU):
-  pass
+    noBodyOnError = False
+
+    def __init__(self, seqNum=None, status=CommandStatus.ESME_ROK, **kwargs):
+        """Some PDU responses have no defined body when the status is not 0
+            c.f. 4.1.4. "BIND_RECEIVER_RESP"
+            c.f. 4.4.2. SMPP PDU Definition "SUBMIT_SM_RESP"
+        """
+        if self.noBodyOnError:
+            if status != CommandStatus.ESME_ROK:
+                self.mandatoryParams = []
+        
+        PDU.__init__(self, seqNum, status, **kwargs)    
 
 class PDUDataRequest(PDURequest):
-  pass
+    pass

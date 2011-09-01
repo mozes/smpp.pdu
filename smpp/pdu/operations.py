@@ -16,19 +16,11 @@ Copyright 2009-2010 Mozes, Inc.
 from smpp.pdu.pdu_types import CommandId, PDU, PDURequest, PDUResponse, PDUDataRequest
 
 class BindTransmitterResp(PDUResponse):
+    noBodyOnError = True
     commandId = CommandId.bind_transmitter_resp
     mandatoryParams = ['system_id']
     optionalParams = ['sc_interface_version']
     
-    def __init__(self, seqNum=None, status=CommandStatus.ESME_ROK, **kwargs):
-        """The PDU has no defined body when the status is not 0
-        c.f. 4.1.4. "BIND_RECEIVER_RESP"
-        """
-        if status != CommandStatus.ESME_ROK:
-            self.mandatoryParams = []
-        
-        PDUResponse.__init__(self, seqNum, status, **kwargs)
-
 class BindTransmitter(PDURequest):
     requireAck = BindTransmitterResp
     commandId = CommandId.bind_transmitter
@@ -43,19 +35,11 @@ class BindTransmitter(PDURequest):
     ]
 
 class BindReceiverResp(PDUResponse):
+    noBodyOnError = True
     commandId = CommandId.bind_receiver_resp
     mandatoryParams = ['system_id']
     optionalParams = ['sc_interface_version']
     
-    def __init__(self, seqNum=None, status=CommandStatus.ESME_ROK, **kwargs):
-        """The PDU has no defined body when the status is not 0
-        c.f. 4.1.4. "BIND_RECEIVER_RESP"
-        """
-        if status != CommandStatus.ESME_ROK:
-            self.mandatoryParams = []
-        
-        PDUResponse.__init__(self, seqNum, status, **kwargs)
-
 class BindReceiver(PDURequest):
     requireAck = BindReceiverResp
     commandId = CommandId.bind_receiver
@@ -70,19 +54,11 @@ class BindReceiver(PDURequest):
     ]
 
 class BindTransceiverResp(PDUResponse):
+    noBodyOnError = True
     commandId = CommandId.bind_transceiver_resp
     mandatoryParams = ['system_id']
     optionalParams = ['sc_interface_version']
-    
-    def __init__(self, seqNum=None, status=CommandStatus.ESME_ROK, **kwargs):
-        """The PDU has no defined body when the status is not 0
-        c.f. 4.1.4. "BIND_RECEIVER_RESP"
-        """
-        if status != CommandStatus.ESME_ROK:
-            self.mandatoryParams = []
         
-        PDUResponse.__init__(self, seqNum, status, **kwargs)
-    
 class BindTransceiver(PDURequest):
     requireAck = BindTransceiverResp
     commandId = CommandId.bind_transceiver
@@ -114,18 +90,10 @@ class GenericNack(PDUResponse):
     commandId = CommandId.generic_nack
 
 class SubmitSMResp(PDUResponse):
+    noBodyOnError = True
     commandId = CommandId.submit_sm_resp
     mandatoryParams = ['message_id']
     
-    def __init__(self, seqNum=None, status=CommandStatus.ESME_ROK, **kwargs):
-        """The PDU has no defined body when the status is not 0
-        c.f. 4.4.2. SMPP PDU Definition "SUBMIT_SM_RESP"
-        """
-        if status != CommandStatus.ESME_ROK:
-            self.mandatoryParams = []
-        
-        PDUResponse.__init__(self, seqNum, status, **kwargs)
-
 class SubmitSM(PDUDataRequest):
     requireAck = SubmitSMResp
     commandId = CommandId.submit_sm
