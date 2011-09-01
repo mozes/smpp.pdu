@@ -464,15 +464,16 @@ class PDUEncoderTest(EncoderTest):
             ms_availability_status=MsAvailabilityStatus.DENIED,
         )
         self.do_conversion_test(PDUEncoder(), pdu, '0000008900000102000000000000000002015858585858585858585858585858585858585858585858585858585858585858585858585858585858585858585858585858585858580001065959595959595959595959595959595959595959595959595959595959595959595959595959595959595959595959595959595959595959000422000101')
+    
     def test_QuerySMResp_conversion(self):
         pdu = QuerySMResp(
             message_id = 'Smsc2003',
-           final_date = None,
-           message_state = MessageState.UNKNOWN,
-           error_code = None
+            final_date = None,
+            message_state = MessageState.UNKNOWN,
+            error_code = None,
         )
-
         self.do_conversion_test(PDUEncoder(), pdu, '0000001c800000030000000000000000536d73633230303300000700')
+
     def test_SubmitSM_conversion(self):
         pdu = SubmitSM(9284,
             service_type='',
