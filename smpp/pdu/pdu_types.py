@@ -142,7 +142,8 @@ class PDU(object):
     def __repr__(self):
         r = "PDU [command: %s, sequence_number: %s, command_status: %s" % (self.id, self.seqNum, self.status)
         for mParam in self.mandatoryParams:
-            r += "\n%s: %s" % (mParam, self.params[mParam])
+            if mParam in self.params:
+                r += "\n%s: %s" % (mParam, self.params[mParam])
         for oParam in self.params.keys():
             if oParam not in self.mandatoryParams:
                 r += "\n%s: %s" % (oParam, self.params[oParam])                
@@ -174,11 +175,12 @@ class PDUResponse(PDU):
             c.f. 4.1.4. "BIND_RECEIVER_RESP"
             c.f. 4.4.2. SMPP PDU Definition "SUBMIT_SM_RESP"
         """
+        PDU.__init__(self, seqNum, status, **kwargs)
+            
         if self.noBodyOnError:
             if status != CommandStatus.ESME_ROK:
-                self.mandatoryParams = []
+                self.params = {}
         
-        PDU.__init__(self, seqNum, status, **kwargs)    
 
 class PDUDataRequest(PDURequest):
     pass

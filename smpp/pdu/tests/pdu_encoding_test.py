@@ -40,6 +40,24 @@ class EncoderTest(unittest.TestCase):
         file = StringIO.StringIO(encoded)
         decoded = encoder.decode(file)
         self.assertEquals(value, decoded)
+        
+    def do_encode_test(self, encoder, value, hexdumpValue):
+        encoded = encoder.encode(value)
+        hexEncoded = binascii.b2a_hex(encoded)
+        if hexdumpValue != hexEncoded:
+            print "\nHex Value:\n%s" % hexdumpValue
+            print "Hex Encoded:\n%s" % hexEncoded
+            chars1 = list(hexdumpValue)
+            chars2 = list(hexEncoded)
+            for i in range(0, len(hexEncoded)):
+                if chars1[i] != chars2[i]:
+                    print "Letter %d diff [%s] [%s]" % (i, chars1[i], chars2[i])
+
+        self.assertEquals(hexdumpValue, hexEncoded)
+        
+    def do_decode_test(self, encoder, value, hexdumpValue):
+        decoded = self.decode(encoder.decode, hexdumpValue)
+        self.assertEquals(value, decoded)
 
     def do_null_encode_test(self, encoder, nullDecodeVal, hexdumpValue):
         encoded = encoder.encode(None)
@@ -533,30 +551,36 @@ class PDUEncoderTest(EncoderTest):
     def test_SubmitSMResp_error_has_no_body(self):
         pdu = SubmitSMResp(1234, status=CommandStatus.ESME_RMSGQFUL)
         self.assertTrue(len(SubmitSMResp.mandatoryParams) > 0)
-        for param in SubmitSMResp.mandatoryParams:
-            self.assertFalse(param in pdu.params)
+        self.assertEquals(0, len(pdu.params))
         self.do_conversion_test(PDUEncoder(), pdu, '000000108000000400000014000004d2')
 
     def test_BindReceiverResp_error_has_no_body(self):
         pdu = BindReceiverResp(3456, status=CommandStatus.ESME_RINVPASWD)
         self.assertTrue(len(BindReceiverResp.mandatoryParams) > 0)
-        for param in BindReceiverResp.mandatoryParams:
-            self.assertFalse(param in pdu.params)
+        self.assertEquals(0, len(pdu.params))
         self.do_conversion_test(PDUEncoder(), pdu, '00000010800000010000000e00000d80')
 
     def test_BindTransmitterResp_error_has_no_body(self):
         pdu = BindTransmitterResp(3456, status=CommandStatus.ESME_RINVPASWD)
         self.assertTrue(len(BindTransmitterResp.mandatoryParams) > 0)
-        for param in BindTransmitterResp.mandatoryParams:
-            self.assertFalse(param in pdu.params)
+        self.assertEquals(0, len(pdu.params))
         self.do_conversion_test(PDUEncoder(), pdu, '00000010800000020000000e00000d80')
 
     def test_BindTransceiverResp_error_has_no_body(self):
         pdu = BindTransceiverResp(3456, status=CommandStatus.ESME_RINVPASWD)
-        self.assertTrue(len(BindTransceiverResp.mandatoryParams) > 0)
-        for param in BindTransceiverResp.mandatoryParams:
-            self.assertFalse(param in pdu.params)
+        self.assertEquals(0, len(pdu.params))
         self.do_conversion_test(PDUEncoder(), pdu, '00000010800000090000000e00000d80')
+
+    def test_BindTransceiverResp_error_has_no_body_status_set_later(self):
+        hex = '00000010800000090000000e00000d80'
+        pdu = BindTransceiverResp(3456, system_id="XYZ")
+        pdu.status = CommandStatus.ESME_RINVPASWD
+        #Even though the system_id param was set, it will not be encoded
+        self.do_encode_test(PDUEncoder(), pdu, hex)
+        #It will decode with no params set
+        pduExpected = BindTransceiverResp(3456, status=CommandStatus.ESME_RINVPASWD)
+        self.assertEquals(0, len(pduExpected.params))
+        self.do_decode_test(PDUEncoder(), pduExpected, hex)
 
 if __name__ == '__main__':
     unittest.main()

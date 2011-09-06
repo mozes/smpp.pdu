@@ -888,6 +888,14 @@ class PDUEncoder(IEncoder):
     def decodeBody(self, file, pdu, bodyLength):
         mandatoryParams = {}
         optionalParams = {}
+        
+        #Some PDU responses have no defined body when the status is not 0
+        #    c.f. 4.1.4. "BIND_RECEIVER_RESP"
+        #    c.f. 4.4.2. SMPP PDU Definition "SUBMIT_SM_RESP"
+        if pdu.status != pdu_types.CommandStatus.ESME_ROK:
+            if pdu.noBodyOnError:
+                return
+        
         iBeforeMParams = file.tell()
         if len(pdu.mandatoryParams) > 0:
             mandatoryParams = self.decodeRequiredParams(pdu.mandatoryParams, self.getRequiredParamEncoders(pdu), file)
@@ -898,11 +906,19 @@ class PDUEncoder(IEncoder):
         pdu.params = dict(mandatoryParams.items() + optionalParams.items())
     
     def encodeBody(self, pdu):
+        body = ''
+        
+        #Some PDU responses have no defined body when the status is not 0
+        #    c.f. 4.1.4. "BIND_RECEIVER_RESP"
+        #    c.f. 4.4.2. SMPP PDU Definition "SUBMIT_SM_RESP"
+        if pdu.status != pdu_types.CommandStatus.ESME_ROK:
+            if pdu.noBodyOnError:
+                return body
+        
         for paramName in pdu.mandatoryParams:
             if paramName not in pdu.params:
                 raise ValueError("Missing required parameter: %s" % paramName)
         
-        body = ''
         body += self.encodeRequiredParams(pdu.mandatoryParams, self.getRequiredParamEncoders(pdu), pdu.params)
         body += self.encodeOptionalParams(pdu.optionalParams, pdu.params)
         return body
