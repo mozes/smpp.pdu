@@ -1,8 +1,6 @@
 import os
 from setuptools import setup, find_packages
-
-def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+from pkg_resources import resource_string
 
 from setuptools import setup, find_packages
 setup(
@@ -13,7 +11,7 @@ setup(
     description = "Library for parsing Protocol Data Units (PDUs) in SMPP protocol",
     license = 'Apache License 2.0',
     packages = find_packages(),
-    long_description=read('README.markdown'),
+    long_description=resource_string(__name__, 'README.markdown'),
     keywords = "smpp pdu",
     url = "https://github.com/mozes/smpp.pdu",
     py_modules=["smpp.pdu"],
