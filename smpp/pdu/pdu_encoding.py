@@ -423,7 +423,7 @@ class DataCodingEncoder(Int1Encoder):
     def _encodeSchemeDataAsInt(self, dataCoding):
         if dataCoding.scheme == pdu_types.DataCodingScheme.GSM_MESSAGE_CLASS:
             return self._encodeGsmMsgSchemeDataAsInt(dataCoding)
-        raise ValueError("Unknown data coding scheme %s" % scheme)
+        raise ValueError("Unknown data coding scheme %s" % dataCoding.scheme)
         
     def _encodeGsmMsgSchemeDataAsInt(self, dataCoding):
         msgCodingName = str(dataCoding.schemeData.msgCoding)
