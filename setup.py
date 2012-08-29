@@ -5,7 +5,7 @@ from pkg_resources import resource_string
 from setuptools import setup, find_packages
 setup(
     name = "smpp.pdu",
-    version = "0.2",
+    version = "0.3",
     author = "Roger Hoover",
     author_email = "roger.hoover@gmail.com",
     description = "Library for parsing Protocol Data Units (PDUs) in SMPP protocol",
@@ -16,6 +16,7 @@ setup(
     url = "https://github.com/mozes/smpp.pdu",
     py_modules=["smpp.pdu"],
     include_package_data = True,
+    package_data={'smpp.pdu': ['README.markdown']},
     zip_safe = False,   
     install_requires = [
         'enum',
