@@ -91,4 +91,9 @@ Creating and encoding PDUs
     # short_message: HELLO
     # ]
     # HEX: 000000360000000400000000000024440005006d6f62696c65776179000101313230383233300000000000000100f2000548454c4c4f
-    
+
+Credits
+=======
+Thanks to [dliappis](https://github.com/dliappis) for a improvements parsing relative time.
+Thanks to [Andrés Reyes Monge](https://github.com/armonge) for bug fixes parsing QuerySMResp.
+Thanks to [Fourat Zouari](https://github.com/fourat) for many bug reports, fixes, and suggestions.
