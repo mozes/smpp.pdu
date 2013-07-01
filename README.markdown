@@ -94,6 +94,6 @@ Creating and encoding PDUs
 
 Credits
 =======
-Thanks to [dliappis](https://github.com/dliappis) for a improvements parsing relative time.
-Thanks to [Andrés Reyes Monge](https://github.com/armonge) for bug fixes parsing QuerySMResp.
-Thanks to [Fourat Zouari](https://github.com/fourat) for many bug reports, fixes, and suggestions.
+* Thanks to [dliappis](https://github.com/dliappis) for a improvements parsing relative time.
+* Thanks to [Andrés Reyes Monge](https://github.com/armonge) for bug fixes parsing QuerySMResp.
+* Thanks to [Fourat Zouari](https://github.com/fourat) for many bug reports, fixes, and suggestions.
