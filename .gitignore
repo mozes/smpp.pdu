@@ -8,8 +8,3 @@ _trial_temp
 build/
 dist/
 devpython/
-smpp_time_test.py
-gsm_encoding_test.py
-pdu_encoding_test.py
-pdu_types_test.py
-sm_encoding_test.py
