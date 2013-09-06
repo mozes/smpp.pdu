@@ -606,7 +606,7 @@ class NetworkTypeEncoder(IntegerWrapperEncoder):
     pduType = pdu_types.NetworkType
 
 class BearerTypeEncoder(IntegerWrapperEncoder):
-    fieldName = 'network_type'
+    fieldName = 'bearer_type'
     nameMap = constants.bearer_type_name_map
     valueMap = constants.bearer_type_value_map
     encoder = Int1Encoder()
@@ -634,7 +634,7 @@ class LanguageIndicatorEncoder(IntegerWrapperEncoder):
     pduType = pdu_types.LanguageIndicator
 
 class DisplayTimeEncoder(IntegerWrapperEncoder):
-    fieldName = 'language_indicator'
+    fieldName = 'display_time'
     nameMap = constants.display_time_name_map
     valueMap = constants.display_time_value_map
     encoder = Int1Encoder()
