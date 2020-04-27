@@ -30,7 +30,7 @@ class SMPPClientConnectionCorruptedError(SMPPClientError):
 class SMPPClientSessionStateError(SMPPClientError):
     """Raised when illegal operations are attempted for the client's session state
     """
-    
+
 class SMPPTransactionError(SMPPError):
     """Raised for transaction errors
     """
@@ -38,9 +38,9 @@ class SMPPTransactionError(SMPPError):
         self.response = response
         self.request = request
         SMPPError.__init__(self, self.getErrorStr())
-        
+
     def getErrorStr(self):
-        errCodeName = str(self.response.status)
+        errCodeName = self.response.status.name
         errCodeVal = constants.command_status_name_map[errCodeName]
         errCodeDesc = constants.command_status_value_map[errCodeVal]
         return '%s (%s)' % (errCodeName, errCodeDesc)
@@ -65,7 +65,9 @@ class SMPPProtocolError(SMPPError):
         SMPPError.__init__(self, "%s: %s" % (self.getStatusDescription(), errStr))
 
     def getStatusDescription(self):
-        intVal = constants.command_status_name_map[str(self.status)]
+        # _name_ gets the str name value of an enum
+        # https://docs.python.org/3/library/enum.html#supported-sunder-names
+        intVal = constants.command_status_name_map[self.status.name]
         return constants.command_status_value_map[intVal]['description']
 
 class SessionStateError(SMPPProtocolError):

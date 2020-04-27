@@ -16,7 +16,7 @@ Copyright 2009-2010 Mozes, Inc.
 from smpp.pdu import pdu_types
 from smpp.pdu.error import PDUCorruptError
 
-class IEncoder(object):
+class IEncoder:
 
     def encode(self, value):
         """Takes an object representing the type and returns a byte string"""
@@ -25,7 +25,7 @@ class IEncoder(object):
     def decode(self, file):
         """Takes file stream in and returns an object representing the type"""
         raise NotImplementedError()
-        
+
     def read(self, file, size):
         bytesRead = file.read(size)
         length = len(bytesRead)

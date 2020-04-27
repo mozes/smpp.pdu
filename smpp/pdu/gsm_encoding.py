@@ -25,33 +25,38 @@ class UDHInformationElementIdentifierUnknownError(UDHParseError):
     pass
 
 class Int8Encoder(IEncoder):
-    
+
     def encode(self, value):
         return struct.pack('!B', value)
 
     def decode(self, file):
         byte = self.read(file, 1)
-        return struct.unpack('!B', byte)[0]
+        if isinstance(byte, bytes):
+            return struct.unpack('!B', byte)[0]
+        return struct.unpack('!B', bytes([byte]))[0]
 
 class Int16Encoder(IEncoder):
-    
+
     def encode(self, value):
         return struct.pack('!H', value)
 
     def decode(self, file):
-        bytes = self.read(file, 2)
-        return struct.unpack('!H', bytes)[0]
+        dec_bytes = self.read(file, 2)
+        if isinstance(dec_bytes, bytes):
+            return struct.unpack('!H', dec_bytes)[0]
+        return struct.unpack('!H', bytes([dec_bytes]))[0]
 
 class InformationElementIdentifierEncoder(IEncoder):
     int8Encoder = Int8Encoder()
     nameMap = gsm_constants.information_element_identifier_name_map
     valueMap = gsm_constants.information_element_identifier_value_map
-    
+
     def encode(self, value):
-        name = str(value)
-        if name not in self.nameMap:
-            raise ValueError("Unknown InformationElementIdentifier name %s" % name)
-        return self.int8Encoder.encode(self.nameMap[name])        
+        # _name_ gets the str name value of an enum
+        # https://docs.python.org/3/library/enum.html#supported-sunder-names
+        if value.name not in self.nameMap:
+            raise ValueError("Unknown InformationElementIdentifier name %s" % value.name)
+        return self.int8Encoder.encode(self.nameMap[value.name])
 
     def decode(self, file):
         intVal = self.int8Encoder.decode(file)
@@ -59,24 +64,24 @@ class InformationElementIdentifierEncoder(IEncoder):
             errStr = "Unknown InformationElementIdentifier value %s" % intVal
             raise UDHInformationElementIdentifierUnknownError(errStr)
         name = self.valueMap[intVal]
-        return getattr(gsm_types.InformationElementIdentifier, name)    
+        return getattr(gsm_types.InformationElementIdentifier, name)
 
 class IEConcatenatedSMEncoder(IEncoder):
     int8Encoder = Int8Encoder()
     int16Encoder = Int16Encoder()
-    
+
     def __init__(self, is16bitRefNum):
         self.is16bitRefNum = is16bitRefNum
-    
+
     def encode(self, cms):
-        bytes = ''
+        enc_bytes = b''
         if self.is16bitRefNum:
-            bytes += self.int16Encoder.encode(cms.referenceNum)
+            enc_bytes += self.int16Encoder.encode(cms.referenceNum)
         else:
-            bytes += self.int8Encoder.encode(cms.referenceNum)
-        bytes += self.int8Encoder.encode(cms.maximumNum)
-        bytes += self.int8Encoder.encode(cms.sequenceNum)
-        return bytes
+            enc_bytes += self.int8Encoder.encode(cms.referenceNum)
+        enc_bytes += self.int8Encoder.encode(cms.maximumNum)
+        enc_bytes += self.int8Encoder.encode(cms.sequenceNum)
+        return enc_bytes
 
     def decode(self, file):
         refNum = None
@@ -95,7 +100,7 @@ class InformationElementEncoder(IEncoder):
         gsm_types.InformationElementIdentifier.CONCATENATED_SM_8BIT_REF_NUM: IEConcatenatedSMEncoder(False),
         gsm_types.InformationElementIdentifier.CONCATENATED_SM_16BIT_REF_NUM: IEConcatenatedSMEncoder(True),
     }
-    
+
     def encode(self, iElement):
         dataBytes = None
         if iElement.identifier in self.dataEncoders:
@@ -103,46 +108,46 @@ class InformationElementEncoder(IEncoder):
         else:
             dataBytes = iElement.data
         length = len(dataBytes)
-            
-        bytes = ''
-        bytes += self.iEIEncoder.encode(iElement.identifier)
-        bytes += self.int8Encoder.encode(length)
-        bytes += dataBytes
-        return bytes
+
+        enc_bytes = b''
+        enc_bytes += self.iEIEncoder.encode(iElement.identifier)
+        enc_bytes += self.int8Encoder.encode(length)
+        enc_bytes += dataBytes
+        return enc_bytes
 
     def decode(self, file):
         fStart = file.tell()
-        
+
         identifier = None
         try:
             identifier = self.iEIEncoder.decode(file)
         except UDHInformationElementIdentifierUnknownError:
             #Continue parsing after this so that these can be ignored
             pass
-        
+
         length = self.int8Encoder.decode(file)
         data = None
         if identifier in self.dataEncoders:
             data = self.dataEncoders[identifier].decode(file)
         elif length > 0:
             data = self.read(file, length)
-            
+
         parsed = file.tell() - fStart
         if parsed != length + 2:
             raise UDHParseError("Invalid length: expected %d, parsed %d" % (length + 2, parsed))
-        
+
         if identifier is None:
             return None
-        
+
         return gsm_types.InformationElement(identifier, data)
-        
+
 class UserDataHeaderEncoder(IEncoder):
     iEEncoder = InformationElementEncoder()
     int8Encoder = Int8Encoder()
-        
+
     def encode(self, udh):
         nonRepeatable = {}
-        iEBytes = ''
+        iEBytes = b''
         for iElement in udh:
             if not self.isIdentifierRepeatable(iElement.identifier):
                 if iElement.identifier in nonRepeatable:
@@ -151,7 +156,7 @@ class UserDataHeaderEncoder(IEncoder):
                     if identifier in nonRepeatable:
                         raise ValueError("%s and %s are mutually exclusive elements" % (str(iElement.identifier), str(identifier)))
                 nonRepeatable[iElement.identifier] = None
-            iEBytes += self.iEEncoder.encode(iElement)   
+            iEBytes += self.iEEncoder.encode(iElement)
         headerLen = len(iEBytes)
         return self.int8Encoder.encode(headerLen) + iEBytes
 
@@ -174,11 +179,11 @@ class UserDataHeaderEncoder(IEncoder):
                         if identifier in nonRepeatable:
                             del nonRepeatable[identifier]
             bytesRead = file.tell() - iStart
-        return repeatable + nonRepeatable.values()
-        
+        return repeatable + list(nonRepeatable.values())
+
     def isIdentifierRepeatable(self, identifier):
-        return gsm_constants.information_element_identifier_full_value_map[gsm_constants.information_element_identifier_name_map[str(identifier)]]['repeatable']
-        
+        return gsm_constants.information_element_identifier_full_value_map[gsm_constants.information_element_identifier_name_map[identifier.name]]['repeatable']
+
     def getIdentifierExclusionList(self, identifier):
-        nameList = gsm_constants.information_element_identifier_full_value_map[gsm_constants.information_element_identifier_name_map[str(identifier)]]['excludes']
+        nameList = gsm_constants.information_element_identifier_full_value_map[gsm_constants.information_element_identifier_name_map[identifier.name]]['excludes']
         return [getattr(gsm_types.InformationElementIdentifier, name) for name in nameList]

@@ -13,198 +13,299 @@ Copyright 2009-2010 Mozes, Inc.
    See the License for the specific language governing permissions and
    limitations under the License.
 """
+
+"""
+Updated code parts are marked with "Jasmin update" comment
+"""
 command_status_value_map = {
-    0x00000000L : {
-        'name' : 'ESME_ROK',
-        'description' : 'No error',
+    0x00000000: {
+        'name': 'ESME_ROK',
+        'description': 'No error',
     },
-    0x00000001L : {
-        'name' : 'ESME_RINVMSGLEN',
+    0x00000001: {
+        'name': 'ESME_RINVMSGLEN',
         'description': 'Message Length is invalid',
     },
-    0x00000002L : {
-        'name' : 'ESME_RINVCMDLEN',
+    0x00000002: {
+        'name': 'ESME_RINVCMDLEN',
         'description': 'Command Length is invalid',
     },
-    0x00000003L : {
-        'name' : 'ESME_RINVCMDID',
+    0x00000003: {
+        'name': 'ESME_RINVCMDID',
         'description': 'Invalid Command ID',
     },
-    0x00000004L : {
-        'name' : 'ESME_RINVBNDSTS',
+    0x00000004: {
+        'name': 'ESME_RINVBNDSTS',
         'description': 'Invalid BIND Status for given command',
     },
-    0x00000005L : {
-        'name' : 'ESME_RALYBND',
+    0x00000005: {
+        'name': 'ESME_RALYBND',
         'description': 'ESME Already in Bound State',
     },
-    0x00000006L : {
-        'name' : 'ESME_RINVPRTFLG',
+    0x00000006: {
+        'name': 'ESME_RINVPRTFLG',
         'description': 'Invalid Priority Flag',
     },
-    0x00000007L : {
-        'name' : 'ESME_RINVREGDLVFLG',
+    0x00000007: {
+        'name': 'ESME_RINVREGDLVFLG',
         'description': 'Invalid Registered Delivery Flag',
     },
-    0x00000008L : {
-        'name' : 'ESME_RSYSERR',
+    0x00000008: {
+        'name': 'ESME_RSYSERR',
         'description': 'System Error',
     },
-    0x0000000AL : {
-        'name' : 'ESME_RINVSRCADR',
+    0x0000000A: {
+        'name': 'ESME_RINVSRCADR',
         'description': 'Invalid Source Address',
     },
-    0x0000000BL : {
-        'name' : 'ESME_RINVDSTADR',
+    0x0000000B: {
+        'name': 'ESME_RINVDSTADR',
         'description': 'Invalid Dest Addr',
     },
-    0x0000000CL : {
-        'name' : 'ESME_RINVMSGID',
+    0x0000000C: {
+        'name': 'ESME_RINVMSGID',
         'description': 'Message ID is invalid',
     },
-    0x0000000DL : {
-        'name' : 'ESME_RBINDFAIL',
+    0x0000000D: {
+        'name': 'ESME_RBINDFAIL',
         'description': 'Bind Failed',
     },
-    0x0000000EL : {
-        'name' : 'ESME_RINVPASWD',
+    0x0000000E: {
+        'name': 'ESME_RINVPASWD',
         'description': 'Invalid Password',
     },
-    0x0000000FL : {
-        'name' : 'ESME_RINVSYSID',
+    0x0000000F: {
+        'name': 'ESME_RINVSYSID',
         'description': 'Invalid System ID',
     },
-    0x00000011L : {
-        'name' : 'ESME_RCANCELFAIL',
+    0x00000011: {
+        'name': 'ESME_RCANCELFAIL',
         'description': 'Cancel SM Failed',
     },
-    0x00000013L : {
-        'name' : 'ESME_RREPLACEFAIL',
+    0x00000013: {
+        'name': 'ESME_RREPLACEFAIL',
         'description': 'Replace SM Failed',
     },
-    0x00000014L : {
-        'name' : 'ESME_RMSGQFUL',
+    0x00000014: {
+        'name': 'ESME_RMSGQFUL',
         'description': 'Message Queue Full',
     },
-    0x00000015L : {
-        'name' : 'ESME_RINVSERTYP',
+    0x00000015: {
+        'name': 'ESME_RINVSERTYP',
         'description': 'Invalid Service Type',
     },
-    0x00000033L : {
-        'name' : 'ESME_RINVNUMDESTS',
+    0x00000033: {
+        'name': 'ESME_RINVNUMDESTS',
         'description': 'Invalid number of destinations',
     },
-    0x00000034L : {
-        'name' : 'ESME_RINVDLNAME',
+    0x00000034: {
+        'name': 'ESME_RINVDLNAME',
         'description': 'Invalid Distribution List Name',
     },
-    0x00000040L : {
-        'name' : 'ESME_RINVDESTFLAG',
+    0x00000040: {
+        'name': 'ESME_RINVDESTFLAG',
         'description': 'Destination flag is invalid (submit_multi)',
     },
-    0x00000042L : {
-        'name' : 'ESME_RINVSUBREP',
+    0x00000042: {
+        'name': 'ESME_RINVSUBREP',
         'description': 'Invalid submit with replace request (i.e.  submit_sm with replace_if_present_flag set)',
     },
-    0x00000043L : {
-        'name' : 'ESME_RINVESMCLASS',
+    0x00000043: {
+        'name': 'ESME_RINVESMCLASS',
         'description': 'Invalid esm_class field data',
     },
-    0x00000044L : {
-        'name' : 'ESME_RCNTSUBDL',
+    0x00000044: {
+        'name': 'ESME_RCNTSUBDL',
         'description': 'Cannot Submit to Distribution List',
     },
-    0x00000045L : {
-        'name' : 'ESME_RSUBMITFAIL',
+    0x00000045: {
+        'name': 'ESME_RSUBMITFAIL',
         'description': 'submit_sm or submit_multi failed',
     },
-    0x00000048L : {
-        'name' : 'ESME_RINVSRCTON',
+    0x00000048: {
+        'name': 'ESME_RINVSRCTON',
         'description': 'Invalid Source address TON',
     },
-    0x00000049L : {
-        'name' : 'ESME_RINVSRCNPI',
+    0x00000049: {
+        'name': 'ESME_RINVSRCNPI',
         'description': 'Invalid Source address NPI',
     },
-    0x00000050L : {
-        'name' : 'ESME_RINVDSTTON',
+    0x00000050: {
+        'name': 'ESME_RINVDSTTON',
         'description': 'Invalid Destination address TON',
     },
-    0x00000051L : {
-        'name' : 'ESME_RINVDSTNPI',
+    0x00000051: {
+        'name': 'ESME_RINVDSTNPI',
         'description': 'Invalid Destination address NPI',
     },
-    0x00000053L : {
-        'name' : 'ESME_RINVSYSTYP',
+    0x00000053: {
+        'name': 'ESME_RINVSYSTYP',
         'description': 'Invalid system_type field',
     },
-    0x00000054L : {
-        'name' : 'ESME_RINVREPFLAG',
+    0x00000054: {
+        'name': 'ESME_RINVREPFLAG',
         'description': 'Invalid replace_if_present flag',
     },
-    0x00000055L : {
-        'name' : 'ESME_RINVNUMMSGS',
+    0x00000055: {
+        'name': 'ESME_RINVNUMMSGS',
         'description': 'Invalid number of messages',
     },
-    0x00000058L : {
-        'name' : 'ESME_RTHROTTLED',
+    0x00000058: {
+        'name': 'ESME_RTHROTTLED',
         'description': 'Throttling error (ESME has exceeded allowed message limits',
     },
-    0x00000061L : {
-        'name' : 'ESME_RINVSCHED',
+    0x00000061: {
+        'name': 'ESME_RINVSCHED',
         'description': 'Invalid Scheduled Delivery Time',
     },
-    0x00000062L : {
-        'name' : 'ESME_RINVEXPIRY',
+    0x00000062: {
+        'name': 'ESME_RINVEXPIRY',
         'description': 'Invalid message validity period (Expiry time)',
     },
-    0x00000063L : {
-        'name' : 'ESME_RINVDFTMSGID',
+    0x00000063: {
+        'name': 'ESME_RINVDFTMSGID',
         'description': 'Predefined Message Invalid or Not Found',
     },
-    0x00000064L : {
-        'name' : 'ESME_RX_T_APPN',
+    0x00000064: {
+        'name': 'ESME_RX_T_APPN',
         'description': 'ESME Receiver Temporary App Error Code',
     },
-    0x00000065L : {
-        'name' : 'ESME_RX_P_APPN',
+    0x00000065: {
+        'name': 'ESME_RX_P_APPN',
         'description': 'ESME Receiver Permanent App Error Code',
     },
-    0x00000066L : {
-        'name' : 'ESME_RX_R_APPN',
+    0x00000066: {
+        'name': 'ESME_RX_R_APPN',
         'description': 'ESME Receiver Reject Message Error Code',
     },
-    0x00000067L : {
-        'name' : 'ESME_RQUERYFAIL',
+    0x00000067: {
+        'name': 'ESME_RQUERYFAIL',
         'description': 'query_sm request failed',
     },
-    0x000000C0L : {
-        'name' : 'ESME_RINVOPTPARSTREAM',
+    0x000000C0: {
+        'name': 'ESME_RINVOPTPARSTREAM',
         'description': 'Error in the optional part of the PDU Body',
     },
-    0x000000C1L : {
-        'name' : 'ESME_ROPTPARNOTALLWD',
+    0x000000C1: {
+        'name': 'ESME_ROPTPARNOTALLWD',
         'description': 'Optional Parameter not allowed',
     },
-    0x000000C2L : {
-        'name' : 'ESME_RINVPARLEN',
+    0x000000C2: {
+        'name': 'ESME_RINVPARLEN',
         'description': 'Invalid Parameter Length',
     },
-    0x000000C3L : {
-        'name' : 'ESME_RMISSINGOPTPARAM',
+    0x000000C3: {
+        'name': 'ESME_RMISSINGOPTPARAM',
         'description': 'Expected Optional Parameter missing',
     },
-    0x000000C4L : {
-        'name' : 'ESME_RINVOPTPARAMVAL',
+    0x000000C4: {
+        'name': 'ESME_RINVOPTPARAMVAL',
         'description': 'Invalid Optional Parameter Value',
     },
-    0x000000FEL : {
-        'name' : 'ESME_RDELIVERYFAILURE',
+    0x000000FE: {
+        'name': 'ESME_RDELIVERYFAILURE',
         'description': 'Delivery Failure (used for data_sm_resp)',
     },
-    0x000000FFL : {
-        'name' : 'ESME_RUNKNOWNERR',
+    0x000000FF: {
+        'name': 'ESME_RUNKNOWNERR',
         'description': 'Unknown Error',
+    },
+    # Jasmin update:
+    0x00000100: {
+        'name': 'ESME_RSERTYPUNAUTH',
+        'description': 'ESME Not authorised to use specified service_type',
+    },
+    0x00000101: {
+        'name': 'ESME_RPROHIBITED',
+        'description': 'ESME Prohibited from using specified operation',
+    },
+    0x00000102: {
+        'name': 'ESME_RSERTYPUNAVAIL',
+        'description': 'Specified service_type is unavailable',
+    },
+    0x00000103: {
+        'name': 'ESME_RSERTYPDENIED',
+        'description': 'Specified service_type is denied',
+    },
+    0x00000104: {
+        'name': 'ESME_RINVDCS',
+        'description': 'Invalid Data Coding Scheme',
+    },
+    0x00000105: {
+        'name': 'ESME_RINVSRCADDRSUBUNIT',
+        'description': 'Source Address Sub unit is Invalid',
+    },
+    0x00000106: {
+        'name': 'ESME_RINVDSTADDRSUBUNIT',
+        'description': 'Destination Address Sub unit is Invalid',
+    },
+    0x00000107: {
+        'name': 'ESME_RINVBCASTFREQINT',
+        'description': 'Broadcast Frequency Interval is invalid',
+    },
+    0x00000108: {
+        'name': 'ESME_RINVBCASTALIAS_NAME',
+        'description': 'Broadcast Alias Name is invalid',
+    },
+    0x00000109: {
+        'name': 'ESME_RINVBCASTAREAFMT',
+        'description': 'Broadcast Area Format is invalid',
+    },
+    0x0000010a: {
+        'name': 'ESME_RINVNUMBCAST_AREAS',
+        'description': 'Number of Broadcast Areas is invalid',
+    },
+    0x0000010b: {
+        'name': 'ESME_RINVBCASTCNTTYPE',
+        'description': 'Broadcast Content Type is invalid',
+    },
+    0x0000010c: {
+        'name': 'ESME_RINVBCASTMSGCLASS',
+        'description': 'Broadcast Message Class is invalid',
+    },
+    0x0000010d: {
+        'name': 'ESME_RBCASTFAIL',
+        'description': 'broadcast_sm operation failed',
+    },
+    0x0000010e: {
+        'name': 'ESME_RBCASTQUERYFAIL',
+        'description': 'query_broadcast_sm operation failed',
+    },
+    0x0000010f: {
+        'name': 'ESME_RBCASTCANCELFAIL',
+        'description': 'cancel_broadcast_sm operation failed',
+    },
+    0x00000110: {
+        'name': 'ESME_RINVBCAST_REP',
+        'description': 'Number of Repeated Broadcasts is invalid',
+    },
+    0x00000111: {
+        'name': 'ESME_RINVBCASTSRVGRP',
+        'description': 'Broadcast Service Group is invalid',
+    },
+    0x00000112: {
+        'name': 'ESME_RINVBCASTCHANIND',
+        'description': 'Broadcast Channel Indicator is invalid',
+    },
+    # Jasmin update:
+    -1: {
+        'name': 'RESERVEDSTATUS_SMPP_EXTENSION',
+        'description': 'Reserved for SMPP extension',
+    },
+    # Jasmin update:
+    -2: {
+        'name': 'RESERVEDSTATUS_VENDOR_SPECIFIC',
+        'description': 'Reserved for SMSC vendor specific errors',
+    },
+    # Jasmin update:
+    -3: {
+        'name': 'RESERVEDSTATUS',
+        'description': 'Reserved',
+    },
+    # Jasmin update:
+    -4: {
+        'name': 'RESERVEDSTATUS_UNKNOWN_STATUS',
+        'description': 'Unknown status',
     },
 }
 
@@ -287,6 +388,8 @@ tag_name_map = {
     'alert_on_message_delivery': 0x130C,
     'its_reply_type': 0x1380,
     'its_session_info': 0x1383,
+    # Jasmin update: bypass vendor specific tags
+    'vendor_specific_bypass': -1,
 }
 
 tag_value_map = dict([(val, key) for (key, val) in tag_name_map.items()])
@@ -320,13 +423,15 @@ registered_delivery_receipt_name_map = {
     'SMSC_DELIVERY_RECEIPT_REQUESTED': 0x01,
     'SMSC_DELIVERY_RECEIPT_REQUESTED_FOR_FAILURE': 0x02,
 }
-registered_delivery_receipt_value_map = dict([(val, key) for (key, val) in registered_delivery_receipt_name_map.items()])
+registered_delivery_receipt_value_map = dict(
+    [(val, key) for (key, val) in registered_delivery_receipt_name_map.items()])
 
 registered_delivery_sme_originated_acks_name_map = {
     'SME_DELIVERY_ACK_REQUESTED': 0x04,
     'SME_MANUAL_ACK_REQUESTED': 0x08,
 }
-registered_delivery_sme_originated_acks_value_map = dict([(val, key) for (key, val) in registered_delivery_sme_originated_acks_name_map.items()])
+registered_delivery_sme_originated_acks_value_map = dict(
+    [(val, key) for (key, val) in registered_delivery_sme_originated_acks_name_map.items()])
 
 addr_subunit_name_map = {
     'UNKNOWN': 0x00,
@@ -408,7 +513,8 @@ data_coding_gsm_message_coding_name_map = {
     'DEFAULT_ALPHABET': 0x00,
     'DATA_8BIT': 0x04,
 }
-data_coding_gsm_message_coding_value_map = dict([(val, key) for (key, val) in data_coding_gsm_message_coding_name_map.items()])
+data_coding_gsm_message_coding_value_map = dict(
+    [(val, key) for (key, val) in data_coding_gsm_message_coding_name_map.items()])
 
 data_coding_gsm_message_class_name_map = {
     'NO_MESSAGE_CLASS': 0x00,
@@ -416,7 +522,8 @@ data_coding_gsm_message_class_name_map = {
     'CLASS_2': 0x02,
     'CLASS_3': 0x03,
 }
-data_coding_gsm_message_class_value_map = dict([(val, key) for (key, val) in data_coding_gsm_message_class_name_map.items()])
+data_coding_gsm_message_class_value_map = dict(
+    [(val, key) for (key, val) in data_coding_gsm_message_class_name_map.items()])
 
 dest_flag_name_map = {
     'SME_ADDRESS': 0x01,
@@ -440,12 +547,15 @@ callback_num_digit_mode_indicator_name_map = {
     'TBCD': 0x00,
     'ASCII': 0x01,
 }
-callback_num_digit_mode_indicator_value_map = dict([(val, key) for (key, val) in callback_num_digit_mode_indicator_name_map.items()])
+callback_num_digit_mode_indicator_value_map = dict(
+    [(val, key) for (key, val) in callback_num_digit_mode_indicator_name_map.items()])
 
 subaddress_type_tag_name_map = {
     'NSAP_EVEN': 0x80,
     'NSAP_ODD': 0x88,
     'USER_SPECIFIED': 0xa0,
+    # Jasmin update: (#325)
+    'RESERVED': 0x00,
 }
 subaddress_type_tag_value_map = dict([(val, key) for (key, val) in subaddress_type_tag_name_map.items()])
 
@@ -455,6 +565,15 @@ ms_availability_status_name_map = {
     'UNAVAILABLE': 0x02,
 }
 ms_availability_status_value_map = dict([(val, key) for (key, val) in ms_availability_status_name_map.items()])
+
+# Jasmin update:
+network_error_code_name_map = {
+    'ANSI-136': 0x01,
+    'IS-95': 0x02,
+    'GSM': 0x03,
+    'RESERVED': 0x04,
+}
+network_error_code_value_map = dict([(val, key) for (key, val) in network_error_code_name_map.items()])
 
 network_type_name_map = {
     'UNKNOWN': 0x00,
