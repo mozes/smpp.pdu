@@ -26,13 +26,13 @@ CommandStatus = Enum('CommandStatus', list(constants.command_status_name_map.key
 
 Tag = Enum('Tag', list(constants.tag_name_map.keys()))
 
-Option = namedtuple('Option', 'tag, value')
+Option = namedtuple('Option', ['tag', 'value'])
 
 EsmClassMode = Enum('EsmClassMode', list(constants.esm_class_mode_name_map.keys()))
 EsmClassType = Enum('EsmClassType', list(constants.esm_class_type_name_map.keys()))
 EsmClassGsmFeatures = Enum('EsmClassGsmFeatures', list(constants.esm_class_gsm_features_name_map.keys()))
 
-EsmClassBase = namedtuple('EsmClass', 'mode, type, gsmFeatures')
+EsmClassBase = namedtuple('EsmClass', ['mode', 'type', 'gsmFeatures'])
 
 class EsmClass(EsmClassBase):
 
@@ -45,7 +45,7 @@ class EsmClass(EsmClassBase):
 RegisteredDeliveryReceipt = Enum('RegisteredDeliveryReceipt', list(constants.registered_delivery_receipt_name_map.keys()))
 RegisteredDeliverySmeOriginatedAcks = Enum('RegisteredDeliverySmeOriginatedAcks', list(constants.registered_delivery_sme_originated_acks_name_map.keys()))
 
-RegisteredDeliveryBase = namedtuple('RegisteredDelivery', 'receipt, smeOriginatedAcks, intermediateNotification')
+RegisteredDeliveryBase = namedtuple('RegisteredDelivery', ['receipt', 'smeOriginatedAcks', 'intermediateNotification'])
 
 class RegisteredDelivery(RegisteredDeliveryBase):
 
@@ -65,7 +65,7 @@ DataCodingDefault = Enum('DataCodingDefault', list(constants.data_coding_default
 DataCodingGsmMsgCoding = Enum('DataCodingGsmMsgCoding', list(constants.data_coding_gsm_message_coding_name_map.keys()))
 DataCodingGsmMsgClass = Enum('DataCodingGsmMsgClass', list(constants.data_coding_gsm_message_class_name_map.keys()))
 
-DataCodingGsmMsgBase = namedtuple('DataCodingGsmMsg', 'msgCoding, msgClass')
+DataCodingGsmMsgBase = namedtuple('DataCodingGsmMsg', ['msgCoding', 'msgClass'])
 
 class DataCodingGsmMsg(DataCodingGsmMsgBase):
 
@@ -100,7 +100,7 @@ MessageState = Enum('MessageState', list(constants.message_state_name_map.keys()
 CallbackNumDigitModeIndicator = Enum('CallbackNumDigitModeIndicator', list(constants.callback_num_digit_mode_indicator_name_map.keys()))
 SubaddressTypeTag = Enum('SubaddressTypeTag', list(constants.subaddress_type_tag_name_map.keys()))
 
-CallbackNumBase = namedtuple('CallbackNum', 'digitModeIndicator, ton, npi, digits')
+CallbackNumBase = namedtuple('CallbackNum', ['digitModeIndicator', 'ton', 'npi', 'digits'])
 class CallbackNum(CallbackNumBase):
 
     def __new__(cls, digitModeIndicator, ton=AddrTon.UNKNOWN, npi=AddrNpi.UNKNOWN, digits=None):
@@ -109,7 +109,7 @@ class CallbackNum(CallbackNumBase):
     def __repr__(self):
         return 'CallbackNum[digitModeIndicator: %s, ton: %s, npi: %s, digits: %s]' % (self.digitModeIndicator, self.ton, self.npi, self.digits)
 
-SubaddressBase = namedtuple('Subaddress', 'typeTag, value')
+SubaddressBase = namedtuple('Subaddress', ['typeTag', 'value'])
 class Subaddress(SubaddressBase):
 
     def __new__(cls, typeTag, value):
@@ -126,7 +126,18 @@ PrivacyIndicator = Enum('PrivacyIndicator', list(constants.privacy_indicator_nam
 LanguageIndicator = Enum('LanguageIndicator', list(constants.language_indicator_name_map.keys()))
 DisplayTime = Enum('DisplayTime', list(constants.display_time_name_map.keys()))
 MsAvailabilityStatus = Enum('MsAvailabilityStatus', list(constants.ms_availability_status_name_map.keys()))
-NetworkErrorCode = Enum('NetworkErrorCode', list(constants.network_error_code_name_map.keys()))
+
+
+NetworkErrorCodeNetworkType = Enum('NetworkErrorCodeNetworkType', list(constants.network_error_code_name_map.keys()))
+
+NetworkErrorCodeBase = namedtuple('NetworkErrorCode', ['networkType', 'value'])
+class NetworkErrorCode(NetworkErrorCodeBase):
+    def __new__(cls, networkType, value):
+        return NetworkErrorCodeBase.__new__(cls, networkType, value)
+
+    def __repr__(self):
+        return 'NetworkErrorCode[networkType: %s, value: %s]' % (self.networkType, self.value)
+
 DeliveryFailureReason = Enum('DeliveryFailureReason', list(constants.delivery_failure_reason_name_map.keys()))
 MoreMessagesToSend = Enum('MoreMessagesToSend', list(constants.more_messages_to_send_name_map.keys()))
 

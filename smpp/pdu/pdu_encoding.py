@@ -773,14 +773,42 @@ class MsAvailabilityStatusEncoder(IntegerWrapperEncoder):
     encoder = Int1Encoder()
     pduType = pdu_types.MsAvailabilityStatus
 
-
-# Jasmin update:
-class NetworkErrorCodeEncoder(OctetStringEncoder):
-    fieldName = 'network_error_code'
+class NetworkErrorCodeNetworkTypeEncoder(IntegerWrapperEncoder):
+    nullable = False
+    fieldName = 'network_error_code_network_type'
     nameMap = constants.network_error_code_name_map
     valueMap = constants.network_error_code_value_map
-    pduType = pdu_types.NetworkErrorCode
+    encoder = Int1Encoder()
+    pduType = pdu_types.NetworkErrorCodeNetworkType
+    decodeErrorStatus = pdu_types.CommandStatus.ESME_RINVOPTPARAMVAL
+    
+class NetworkErrorCodeEncoder(OctetStringEncoder):
+    networkTypeEncoder = NetworkErrorCodeNetworkTypeEncoder()
 
+    def _encode(self, networkError):
+        encoded = b''
+        encoded += self.networkTypeEncoder._encode(networkError.networkType)
+        encoded += networkError.value
+        return encoded
+
+    def _decode(self, dec_bytes):
+        if len(dec_bytes) < 2:
+            raise PDUParseError("Invalid network error size %s" % len(dec_bytes), pdu_types.CommandStatus.ESME_RINVOPTPARAMVAL)
+
+        try:
+            typeInt = dec_bytes[0]
+            if typeInt not in constants.network_error_code_value_map:
+                # byte is being decoded as the ascii value most likely, try transforming the ascii value to an int
+                typeInt = int(chr(typeInt))
+            networkType = self.networkTypeEncoder._decode(typeInt)
+        except PDUParseError as e:
+            networkType = 'RESERVED'
+        except ValueError:
+            # probably could not parse the ascii value to an int default to reserved
+            networkType = 'RESERVED'
+
+        value = dec_bytes[1:]
+        return pdu_types.NetworkErrorCode(networkType, value)
 
 class DeliveryFailureReasonEncoder(IntegerWrapperEncoder):
     fieldName = 'delivery_failure_reason'
@@ -935,6 +963,8 @@ class OptionEncoder(IEncoder):
         if parseLen != self.length:
             raise PDUParseError("Invalid option length: labeled [%d] but parsed [%d]" % (self.length, parseLen),
                                 pdu_types.CommandStatus.ESME_RINVPARLEN)
+        # Reset the length otherwise it carries over to other encoding/decoding operations
+        self.length = None
         return pdu_types.Option(tag, value)
 
 
