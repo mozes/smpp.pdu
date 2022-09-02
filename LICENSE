@@ -11,6 +11,3 @@ Copyright 2009-2010 Mozes, Inc.
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expressed or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-
-With the exception of namedtuple.py which is licensed under the Python
-Software Foundation license: http://www.opensource.org/licenses/PythonSoftFoundation
