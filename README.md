@@ -1,6 +1,10 @@
-smpp.pdu is a Python library for parsing Protocol Data Units (PDUs) in SMPP protocol
+# smpp.pdu
 
+smpp.pdu is a Python library for parsing Protocol Data Units (PDUs) in SMPP protocol
 http://www.nowsms.com/discus/messages/1/24856.html 
+
+[![Tests](https://github.com/DomAmato/smpp.pdu/workflows/Python%20Test/badge.svg)](https://github.com/DomAmato/smpp.pdu/actions)
+[![Coverage Status](https://coveralls.io/repos/github/DomAmato/smpp.pdu/badge.svg?branch=master)](https://coveralls.io/github/DomAmato/smpp.pdu?branch=master)
 
 Examples
 ========
@@ -8,15 +12,15 @@ Examples
 Decoding (parsing) PDUs
 --------------------------
     import binascii
-    import StringIO
+    from io import BytesIO
     from smpp.pdu.pdu_encoding import PDUEncoder
 
     hex = '0000004d00000005000000009f88f12441575342440001013136353035353531323334000101313737333535353430373000000000000000000300117468657265206973206e6f2073706f6f6e'
     binary = binascii.a2b_hex(hex)
-    file = StringIO.StringIO(binary)
+    file = BytesIO(binary)
 
     pdu = PDUEncoder().decode(file)
-    print "PDU: %s" % pdu
+    print("PDU: %s" % pdu)
 
     # Prints the following:
     #
@@ -63,11 +67,11 @@ Creating and encoding PDUs
         data_coding=DataCoding(DataCodingScheme.GSM_MESSAGE_CLASS, DataCodingGsmMsg(DataCodingGsmMsgCoding.DEFAULT_ALPHABET, DataCodingGsmMsgClass.CLASS_2)),
         short_message='HELLO',
     )
-    print "PDU: %s" % pdu
+    print("PDU: %s" % pdu)
 
     binary = PDUEncoder().encode(pdu)
     hexStr = binascii.b2a_hex(binary)
-    print "HEX: %s" % hexStr
+    print("HEX: %s" % hexStr)
     
     # Prints the following:
     #
